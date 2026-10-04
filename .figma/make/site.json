@@ -1,0 +1,15 @@
+{
+  "title": "To'yxona",
+  "description": "O'zbekistondagi eng ishonchli to'y xizmatlari platformasi. Minglab to'yxonalar, dekoratorlar va xizmat ko'rsatuvchilar.",
+  "language": "uz",
+  "icons": {
+    "icon": "/favicon.png"
+  },
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
