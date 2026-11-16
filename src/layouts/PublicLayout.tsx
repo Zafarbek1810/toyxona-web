@@ -1,14 +1,16 @@
 import { Outlet } from "react-router-dom";
 import PublicHeader from "../components/PublicHeader";
 import PublicFooter from "../components/PublicFooter";
-import { useAppContext } from "../context/AppContext";
+import { useAccountBookings, useFavorites } from "../lib/wedding/store";
 
 export default function PublicLayout() {
-  const { cartIds, favIds } = useAppContext();
+  const favorites = useFavorites();
+  const bookings = useAccountBookings();
+  const activeBookings = bookings.filter((item) => item.status !== "cancelled").length;
 
   return (
     <>
-      <PublicHeader cartCount={cartIds.length} favCount={favIds.length} />
+      <PublicHeader favCount={favorites.length} bookingCount={activeBookings} />
       <main>
         <Outlet />
       </main>

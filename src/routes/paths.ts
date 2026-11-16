@@ -1,30 +1,29 @@
 export const paths = {
   home: "/",
-  products: "/products",
-  product: (id: number | string) => `/products/${id}`,
-  store: (slug = "techplus") => `/store/${slug}`,
+  catalog: "/katalog",
+  venue: (id: number | string) => `/toyxonalar/${id}`,
+  venueBook: (id: number | string, date?: string) => {
+    const base = `/toyxonalar/${id}/bron`;
+    return date ? `${base}?date=${date}` : base;
+  },
+  specialists: "/mutaxassislar",
+  specialist: (id: number | string) => `/mutaxassislar/${id}`,
+  specialistJoin: "/mutaxassis/royxatdan-otish",
   auth: "/auth",
-  cart: "/cart",
   favorites: "/favorites",
   account: {
     root: "/account",
-    orders: "/account/orders",
+    bookings: "/account/bookings",
     favorites: "/account/favorites",
     profile: "/account/profile",
-    addresses: "/account/addresses",
-    notifications: "/account/notifications",
-    settings: "/account/settings",
   },
 } as const;
 
 export const accountSectionPaths: Record<string, string> = {
   overview: paths.account.root,
-  orders: paths.account.orders,
+  bookings: paths.account.bookings,
   favorites: paths.account.favorites,
   profile: paths.account.profile,
-  addresses: paths.account.addresses,
-  notifications: paths.account.notifications,
-  settings: paths.account.settings,
 };
 
 export function getAccountSection(pathname: string): string {

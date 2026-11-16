@@ -1,19 +1,16 @@
 export const SITE_NAME = "To'yxona";
 
-/** Exact pathname → page title (without brand suffix). */
 const exactTitles: Record<string, string> = {
   "/": "Bosh sahifa",
-  "/products": "Mahsulotlar",
+  "/katalog": "To'yxonalar",
+  "/mutaxassislar": "Mutaxassislar",
+  "/mutaxassis/royxatdan-otish": "Mutaxassis bo'lish",
   "/auth": "Kirish",
-  "/cart": "Savatcha",
   "/favorites": "Sevimlilar",
   "/account": "Kabinet",
-  "/account/orders": "Buyurtmalarim",
+  "/account/bookings": "Bronlarim",
   "/account/favorites": "Sevimlilar",
   "/account/profile": "Profil",
-  "/account/addresses": "Manzillar",
-  "/account/notifications": "Bildirishnomalar",
-  "/account/settings": "Sozlamalar",
 };
 
 export function formatDocumentTitle(pageTitle?: string | null): string {
@@ -24,12 +21,10 @@ export function formatDocumentTitle(pageTitle?: string | null): string {
 
 export function getPageTitleForPath(pathname: string): string {
   const normalized = pathname.replace(/\/+$/, "") || "/";
-
   if (exactTitles[normalized]) return exactTitles[normalized];
-
-  if (normalized.startsWith("/products/")) return "Mahsulot";
-  if (normalized.startsWith("/store/")) return "Do'kon";
+  if (normalized.includes("/bron")) return "Bron qilish";
+  if (normalized.startsWith("/toyxonalar/")) return "To'yxona";
+  if (normalized.startsWith("/mutaxassislar/")) return "Mutaxassis";
   if (normalized.startsWith("/account")) return "Kabinet";
-
   return SITE_NAME;
 }

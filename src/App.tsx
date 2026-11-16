@@ -4,13 +4,15 @@ import DocumentTitle from "./components/DocumentTitle";
 import ScrollToTop from "./components/ScrollToTop";
 import PublicLayout from "./layouts/PublicLayout";
 import HomePage from "./pages/HomePage";
-import ProductListingPage from "./pages/ProductListingPage";
-import ProductDetailPage from "./pages/ProductDetailPage";
-import SellerStorePage from "./pages/SellerStorePage";
+import CatalogPage from "./pages/CatalogPage";
+import VenueDetailPage from "./pages/VenueDetailPage";
+import BookingPage from "./pages/BookingPage";
+import SpecialistsPage from "./pages/SpecialistsPage";
+import SpecialistDetailPage from "./pages/SpecialistDetailPage";
+import SpecialistRegisterPage from "./pages/SpecialistRegisterPage";
 import AuthPage from "./pages/AuthPage";
-import CartCheckoutPage from "./pages/CartCheckoutPage";
 import FavoritesPage from "./pages/FavoritesPage";
-import CustomerDashboard from "./pages/CustomerDashboard";
+import AccountPage from "./pages/AccountPage";
 import { CustomerGuest, CustomerOnly } from "./routes/guards";
 import { paths } from "./routes/paths";
 import { dismissBootLoader } from "./lib/bootLoader";
@@ -42,20 +44,25 @@ export default function App() {
 
         <Route element={<PublicLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="products" element={<ProductListingPage />} />
-          <Route path="products/:productId" element={<ProductDetailPage />} />
-          <Route path="store/:storeSlug" element={<SellerStorePage />} />
-          <Route path="store" element={<Navigate to={paths.store()} replace />} />
-          <Route path="cart" element={<CartCheckoutPage />} />
+          <Route path="katalog" element={<CatalogPage />} />
+          <Route path="toyxonalar/:venueId" element={<VenueDetailPage />} />
+          <Route path="toyxonalar/:venueId/bron" element={<BookingPage />} />
+          <Route path="mutaxassislar" element={<SpecialistsPage />} />
+          <Route path="mutaxassislar/:specialistId" element={<SpecialistDetailPage />} />
+          <Route path="mutaxassis/royxatdan-otish" element={<SpecialistRegisterPage />} />
           <Route path="favorites" element={<FavoritesPage />} />
           <Route
             path="account/*"
             element={
               <CustomerOnly>
-                <CustomerDashboard />
+                <AccountPage />
               </CustomerOnly>
             }
           />
+          <Route path="products" element={<Navigate to={paths.catalog} replace />} />
+          <Route path="products/:productId" element={<Navigate to={paths.catalog} replace />} />
+          <Route path="cart" element={<Navigate to={paths.catalog} replace />} />
+          <Route path="store/*" element={<Navigate to={paths.catalog} replace />} />
         </Route>
 
         <Route path="*" element={<Navigate to={paths.home} replace />} />

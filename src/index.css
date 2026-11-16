@@ -298,3 +298,45 @@ a, button {
   }
   .auth-petal { display: none; }
 }
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 2.35rem, 0) scale(0.96);
+}
+
+.reveal.is-in {
+  animation: reveal-open 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reveal.is-settled {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  animation: none;
+}
+
+@keyframes reveal-open {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 2.6rem, 0) scale(0.94);
+    filter: blur(8px);
+  }
+  58% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none !important;
+  }
+}

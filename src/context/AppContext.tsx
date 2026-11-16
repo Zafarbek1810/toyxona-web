@@ -6,7 +6,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { cartApi, favoritesApi } from "../lib/api";
 import { getToken } from "../lib/api/client";
 import {
   getSessionUser,
@@ -73,18 +72,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshCartFav = useCallback(async () => {
-    if (!getToken()) {
-      setCartIds(readLocalIds(LOCAL_CART));
-      setFavIds(readLocalIds(LOCAL_FAV));
-      return;
-    }
-    try {
-      const [cart, favs] = await Promise.all([cartApi.get(), favoritesApi.list()]);
-      setCartIds(cart.items.map((i) => i.productId));
-      setFavIds(favs.map((f) => f.productId));
-    } catch {
-      /* keep previous */
-    }
+    setCartIds(readLocalIds(LOCAL_CART));
+    setFavIds(readLocalIds(LOCAL_FAV));
   }, []);
 
   const refreshUser = useCallback(async () => {
@@ -116,72 +105,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [showToast]);
 
   const handleFav = useCallback(
-    async (id: number) => {
-      if (!getToken()) {
-        setFavIds((prev) => {
-          const removing = prev.includes(id);
-          const next = removing ? prev.filter((i) => i !== id) : [...prev, id];
-          writeLocalIds(LOCAL_FAV, next);
-          showToast(removing ? "Sevimlilardan olib tashlandi" : "Sevimlilarga qo'shildi");
-          return next;
-        });
-        return;
-      }
-      try {
-        const res = await favoritesApi.toggle(id);
-        setFavIds((prev) =>
-          res.favorited ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((i) => i !== id),
-        );
-        showToast(res.favorited ? "Sevimlilarga qo'shildi" : "Sevimlilardan olib tashlandi");
-      } catch {
-        showToast("Sevimlilarni yangilab bo'lmadi", "error");
-      }
+    (id: number) => {
+      setFavIds((prev) => {
+        const removing = prev.includes(id);
+        const next = removing ? prev.filter((i) => i !== id) : [...prev, id];
+        writeLocalIds(LOCAL_FAV, next);
+        showToast(removing ? "Sevimlilardan olib tashlandi" : "Sevimlilarga qo'shildi");
+        return next;
+      });
     },
     [showToast],
   );
 
   const handleCart = useCallback(
-    async (id: number) => {
-      if (!getToken()) {
-        setCartIds((prev) => {
-          if (prev.includes(id)) return prev;
-          const next = [...prev, id];
-          writeLocalIds(LOCAL_CART, next);
-          showToast("Savatga qo'shildi ✓");
-          return next;
-        });
-        return;
-      }
-      try {
-        if (cartIds.includes(id)) return;
-        await cartApi.add(id, 1);
-        setCartIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    (id: number) => {
+      setCartIds((prev) => {
+        if (prev.includes(id)) return prev;
+        const next = [...prev, id];
+        writeLocalIds(LOCAL_CART, next);
         showToast("Savatga qo'shildi ✓");
-      } catch (err) {
-        showToast(err instanceof Error ? err.message : "Savatga qo'shib bo'lmadi", "error");
-      }
+        return next;
+      });
     },
-    [cartIds, showToast],
+    [showToast],
   );
 
   const handleRemoveCart = useCallback(
-    async (id: number) => {
-      if (!getToken()) {
-        setCartIds((prev) => {
-          const next = prev.filter((i) => i !== id);
-          writeLocalIds(LOCAL_CART, next);
-          return next;
-        });
-        showToast("Savatdan olib tashlandi", "info");
-        return;
-      }
-      try {
-        await cartApi.remove(id);
-        setCartIds((prev) => prev.filter((i) => i !== id));
-        showToast("Savatdan olib tashlandi", "info");
-      } catch {
-        showToast("Savatni yangilab bo'lmadi", "error");
-      }
+    (id: number) => {
+      setCartIds((prev) => {
+        const next = prev.filter((i) => i !== id);
+        writeLocalIds(LOCAL_CART, next);
+        return next;
+      });
+      showToast("Savatdan olib tashlandi", "info");
     },
     [showToast],
   );

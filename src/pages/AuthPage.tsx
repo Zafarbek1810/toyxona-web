@@ -298,7 +298,7 @@ export default function AuthPage() {
               <div>
                 <span className="mb-4 block h-1 w-10 rounded-full bg-gradient-to-r from-[#E5A818] to-[#00A86B]" />
                 <h1 className="text-[1.7rem] font-extrabold tracking-tight text-[#10231c]">Ro&apos;yxatdan o&apos;tish</h1>
-                <p className="mt-1 text-sm text-[#6d776f]">Xaridor sifatida ro&apos;yxatdan o&apos;ting</p>
+                <p className="mt-1 text-sm text-[#6d776f]">Bronlaringizni kuzatish uchun ro&apos;yxatdan o&apos;ting</p>
               </div>
 
               <div className="mt-7 space-y-4">

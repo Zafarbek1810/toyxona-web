@@ -1,79 +1,66 @@
-import { useEffect, useState } from "react";
-import ProductCard from "../components/ProductCard";
-import { useAppContext } from "../context/AppContext";
+import Reveal from "../components/Reveal";
+import SpecialistCard from "../components/SpecialistCard";
+import VenueCard from "../components/VenueCard";
 import { useAppNavigate } from "../hooks/useAppNavigate";
-import { catalogApi, favoritesApi } from "../lib/api";
-import { getToken } from "../lib/api/client";
-import type { Product } from "../lib/api/types";
+import { useCatalog } from "../context/CatalogContext";
+import { isFavorite, toggleFavorite, useFavorites } from "../lib/wedding/store";
 import { paths } from "../routes/paths";
 
-export default function FavoritesPage() {
+export default function FavoritesPage({ embedded = false }: { embedded?: boolean }) {
   const navigate = useAppNavigate();
-  const { favIds, handleFav, handleCart } = useAppContext();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        if (getToken()) {
-          const favs = await favoritesApi.list();
-          if (!cancelled) setProducts(favs.map((f) => f.product));
-        } else if (favIds.length) {
-          const all = await catalogApi.products({ limit: 100 });
-          if (!cancelled) setProducts(all.filter((p) => favIds.includes(p.id)));
-        } else if (!cancelled) {
-          setProducts([]);
-        }
-      } catch {
-        if (!cancelled) setProducts([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [favIds]);
+  const favorites = useFavorites();
+  const { venues, specialists } = useCatalog();
+  const venueItems = favorites.flatMap((item) => {
+    if (item.kind !== "venue") return [];
+    const venue = venues.find((entry) => entry.id === item.id);
+    return venue ? [venue] : [];
+  });
+  const people = favorites.flatMap((item) => {
+    if (item.kind !== "specialist") return [];
+    const person = specialists.find((entry) => entry.id === item.id);
+    return person ? [person] : [];
+  });
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900" style={{ fontFamily: "var(--font-sans)" }}>Sevimlilar</h1>
-          <p className="text-sm text-gray-400 mt-0.5">{favIds.length} ta mahsulot</p>
-        </div>
-        {favIds.length > 0 && (
-          <button onClick={() => navigate(paths.products)} className="text-sm text-[#00A86B] font-semibold hover:underline">
-            + Mahsulot qo'shish
-          </button>
-        )}
-      </div>
-      {loading ? (
-        <div className="text-center py-24 text-gray-400">Yuklanmoqda...</div>
-      ) : favIds.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-2xl border" style={{ borderColor: "var(--border)" }}>
-          <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center text-3xl mx-auto mb-4">❤️</div>
-          <p className="font-semibold text-gray-700 mb-1">Sevimlilar ro'yxati bo'sh</p>
-          <p className="text-sm text-gray-400 mb-5">Mahsulotni yoqtirganingizda yurak belgisini bosing</p>
-          <button onClick={() => navigate(paths.products)} className="bg-[#00A86B] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#008F5A] transition-colors">
-            Mahsulotlarni ko'rish
+    <div className={embedded ? "" : "max-w-7xl mx-auto px-4 py-8"}>
+      <Reveal>
+        <h1 className={`${embedded ? "text-2xl" : "text-3xl"} font-black text-gray-900 mb-6`} style={{ fontFamily: "var(--font-sans)" }}>Sevimlilar</h1>
+      </Reveal>
+      {favorites.length === 0 && (
+        <div className="bg-white rounded-2xl border p-10 text-center" style={{ borderColor: "var(--border)" }}>
+          <p className="text-gray-500 mb-4">Hali saqlangan to&apos;yxona yoki mutaxassis yo&apos;q.</p>
+          <button type="button" onClick={() => navigate(paths.catalog)} className="rounded-xl bg-[#00A86B] text-white font-semibold px-5 py-2.5">
+            To&apos;yxonalarni ko&apos;rish
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {products.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              onFav={() => handleFav(p.id)}
-              onCart={() => handleCart(p.id)}
-              isFaved={true}
-            />
-          ))}
-        </div>
+      )}
+      {venueItems.length > 0 && (
+        <section className="mb-8">
+          <h2 className="font-bold text-gray-900 mb-3">To&apos;yxonalar</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {venueItems.map((venue, index) => (
+              <Reveal key={venue.id} className="h-full" delay={(index % 3) * 90}>
+                <VenueCard venue={venue} faved onFav={() => toggleFavorite({ kind: "venue", id: venue.id })} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
+      {people.length > 0 && (
+        <section>
+          <h2 className="font-bold text-gray-900 mb-3">Mutaxassislar</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {people.map((item, index) => (
+              <Reveal key={item.id} className="h-full" delay={(index % 4) * 80}>
+                <SpecialistCard
+                  specialist={item}
+                  faved={isFavorite(favorites, { kind: "specialist", id: item.id })}
+                  onFav={() => toggleFavorite({ kind: "specialist", id: item.id })}
+                />
+              </Reveal>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
